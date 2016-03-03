@@ -5,13 +5,13 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 from scrapy.spiders import CrawlSpider, Rule
-from scrapy.linkextractors import LinkExtractor
+# from scrapy.linkextractors import LinkExtractor
 from scrapy.selector import Selector
-from links.items import LinksItem
+from bysj.items import BysjItem
 
 class LinksSpider(CrawlSpider):
     """ scrapy links of tests """
-    name = "links"
+    name = "bysj"
     allowed_domains = ["wangxiao.cn"]
     start_urls = [
         "http://www.wangxiao.cn/zcj/89228922437.html",
@@ -24,17 +24,18 @@ class LinksSpider(CrawlSpider):
     #          callback='parse_item',
     #          follow=True)
     # ]
+    
 
-    def parse_item(self, response):
+
+    def parse(self, response):
         sel = Selector(response)
         sites = sel.xpath('//div[@class="newsCon"]/p[not(child::*)]')
 
         # test info scrapy
         for site in sites:
-            item = LinksItem()
-            test_title = site.xpath('a/@title').extract()
+            item = BysjItem()
 
-            item['test_title'] = [t.encode('utf-8') for t in test_title]
-            item['test_links'] = site.xpath('a/@href').extract()
-            item['test_time'] = site.xpath('span/font/text() | span/text()').extract()
+            test_question = site.xpath('text()').extract()
+            item['test_question'] = [q.encode('utf-8') for q in test_question]
+
             yield item
