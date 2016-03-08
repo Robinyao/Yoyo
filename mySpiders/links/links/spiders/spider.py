@@ -11,23 +11,26 @@ from links.items import LinksItem
 
 class LinksSpider(CrawlSpider):
     """ scrapy links of tests """
-    name = "alls"
+    name = "links"
     allowed_domains = ["wangxiao.cn"]
-    start_urls = [
-        "http://www.wangxiao.cn/zcj/moni/739",
-        "http://www.wangxiao.cn/zcj/moni/740",
-        "http://www.wangxiao.cn/zcj/moni/741",
-        "http://www.wangxiao.cn/zcj/moni/742",
-        "http://www.wangxiao.cn/zcj/moni/743",
-        "http://www.wangxiao.cn/zcj/moni/744",
-        "http://www.wangxiao.cn/zcj/moni/745",
-        "http://www.wangxiao.cn/zcj/moni/746",
-        "http://www.wangxiao.cn/zcj/moni/747",
-    ]
+
+    # use file as input data
+    try:
+        data_file = raw_input("Select the links file : ").strip()
+        fo = open(data_file, 'r')
+    except IOError:
+        print "File is not exist."
+        exit(1)
+    else:
+        start_urls = []
+        for l in fo.readlines():
+            link = l.strip()
+            start_urls.append(link)
+        fo.close()
 
     # automatical scrapy next page
     rules = [
-        Rule(LinkExtractor(allow=('wangxiao.cn/zcj/moni'),
+        Rule(LinkExtractor(allow=('wangxiao.cn'),
              restrict_xpaths=('//a[@class="pNext"]')),
              callback='parse_item',
              follow=True)
@@ -36,8 +39,9 @@ class LinksSpider(CrawlSpider):
     def parse_item(self, response):
         sel = Selector(response)
         sites = sel.xpath('//ul[@class="newsList"]/ul[2]/li')
+        items = []
 
-        # test info scrapy
+        # test info scrapy in item
         for site in sites:
             item = LinksItem()
             test_links = site.xpath('a/@href').extract()
@@ -47,4 +51,5 @@ class LinksSpider(CrawlSpider):
             item['test_links'] = [l.encode('utf-8') for l in test_links]
             item['test_title'] = [t.encode('utf-8') for t in test_title]
             item['test_time'] = [i.encode('utf-8') for i in test_time]
-            yield item
+            items.append(item)
+        return items

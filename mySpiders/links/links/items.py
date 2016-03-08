@@ -12,5 +12,3 @@ class LinksItem(Item):
     test_links = Field()
     # test upload time
     test_time = Field()
-    # next web page
-    next_link = Field()
