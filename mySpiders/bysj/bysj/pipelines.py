@@ -11,7 +11,7 @@ import codecs
 class BysjPipeline(object):
 
     def __init__(self):
-        self.file = codecs.open('test_data.json', mode='wb', encoding='utf-8')
+        self.file = codecs.open('tests.json', mode='wb', encoding='utf-8')
 
     def process_item(self, item, spider):
         line = json.dumps(dict(item)) + '\n'
